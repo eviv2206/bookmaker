@@ -1,0 +1,123 @@
+package by.bsuir.bookmaker.dao.impl;
+
+import by.bsuir.bookmaker.beans.Participant;
+import by.bsuir.bookmaker.dao.IParticipantDAO;
+import by.bsuir.bookmaker.dao.exception.DAOException;
+import by.bsuir.bookmaker.dao.pool.impl.ConnectionPool;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+public class SQLParticipantDAO implements IParticipantDAO {
+
+    private final ConnectionPool connectionPool = ConnectionPool.getInstance();
+    @Override
+    public void addParticipant(String name) throws DAOException {
+        Connection connection = null;
+        try {
+            connection = connectionPool.getConnection();
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO participant (p_name) VALUES (?)");
+            statement.setString(1, name);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DAOException(e.getMessage());
+        } finally {
+            if (connectionPool != null) {
+                connectionPool.releaseConnection(connection);
+            }
+        }
+    }
+
+    @Override
+    public Participant getParticipant(int id) throws DAOException {
+        Connection connection = null;
+        try {
+            connection = connectionPool.getConnection();
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM participant WHERE p_id=?");
+            statement.setString(1, String.valueOf(id));
+            ResultSet res = statement.executeQuery();
+            if (res.next()) {
+                return extractParticipantFromResultSet(res);
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new DAOException(e.getMessage());
+        } finally {
+            if (connectionPool != null) {
+                connectionPool.releaseConnection(connection);
+            }
+        }
+    }
+
+    @Override
+    public void deleteParticipant(int id) throws DAOException {
+        Connection connection = null;
+        try {
+            connection = connectionPool.getConnection();
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM participant WHERE p_id=?");
+            statement.setString(1, String.valueOf(id));
+            int affectedRows = statement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new DAOException("No rows affected");
+            }
+        } catch (SQLException e) {
+            throw new DAOException(e.getMessage());
+        } finally {
+            if (connectionPool != null) {
+                connectionPool.releaseConnection(connection);
+            }
+        }
+    }
+
+    @Override
+    public void updateParticipant(String name, int id) throws DAOException {
+        Connection connection = null;
+        try {
+            connection = connectionPool.getConnection();
+            PreparedStatement statement = connection.prepareStatement("UPDATE participant SET p_name=? WHERE p_id=?");
+            statement.setString(1, name);
+            statement.setString(2, String.valueOf(id));
+            int affectedRows = statement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new DAOException("No rows affected");
+            }
+        } catch (SQLException e) {
+            throw new DAOException(e.getMessage());
+        } finally {
+            if (connectionPool != null) {
+                connectionPool.releaseConnection(connection);
+            }
+        }
+    }
+
+    @Override
+    public ArrayList<Participant> getAllParticipants() throws DAOException {
+        Connection connection = null;
+        try {
+            connection = connectionPool.getConnection();
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM participant ORDER BY p_name DESC");
+            ResultSet res = statement.executeQuery();
+            ArrayList<Participant> participants = new ArrayList<>();
+            while (res.next()) {
+                participants.add(extractParticipantFromResultSet(res));
+            }
+            return participants;
+        } catch (SQLException e) {
+            throw new DAOException(e.getMessage());
+        } finally {
+            if (connectionPool != null) {
+                connectionPool.releaseConnection(connection);
+            }
+        }
+    }
+
+    private Participant extractParticipantFromResultSet(ResultSet resultSet) throws SQLException {
+        int id = resultSet.getInt("p_id");
+        String name = resultSet.getString("p_name");
+        return new Participant(id, name);
+    }
+}
