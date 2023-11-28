@@ -36,6 +36,19 @@
 
         document.getElementById("start_date").setAttribute("min", formattedDate);
     </script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        .item {
+            display: flex;
+            flex-direction: column;
+            width: fit-content;
+            border: 1px solid black;
+            min-width: 300px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
 
@@ -46,8 +59,9 @@
 <form id="adminForm" action="controller?page=admin.jsp" method="POST">
     <select id="command" name="command" onchange="submitForm(this.value)">
         <option disabled selected value><fmt:message key="admin_panel_choose"/></option>
-        <option value="GET_ALL_EVENTS_COMMAND" ${param.command eq 'GET_ALL_EVENTS_COMMAND' ? 'selected' : ''}><fmt:message
-                key="admin_panel_view_events"/></option>
+        <option value="GET_ALL_EVENTS_COMMAND" ${param.command eq 'GET_ALL_EVENTS_COMMAND' ? 'selected' : ''}>
+            <fmt:message
+                    key="admin_panel_view_events"/></option>
         <option value="GET_ALL_USERS_BET_COMMAND" ${param.command eq 'GET_ALL_USERS_BET_COMMAND' ? 'selected' : ''}>
             <fmt:message key="admin_panel_view_bets"/></option>
         <option value="GET_ALL_TOURNAMENTS_COMMAND" ${param.command eq 'GET_ALL_TOURNAMENTS_COMMAND' ? 'selected' : ''}>
@@ -65,8 +79,10 @@
     <c:choose>
         <c:when test="${param.command eq 'GET_ALL_SPORT_TYPE_COMMAND'}">
             <c:forEach var="sportType" items="${requestScope['sportTypes']}">
-                <p>${sportType.name}</p>
-                <p>${sportType.description}</p>
+                <div class="item">
+                    <span><fmt:message key="admin_panel_name_sportType"/>: ${sportType.name}</span>
+                    <span><fmt:message key="admin_panel_description"/>: ${sportType.description}</span>
+                </div>
             </c:forEach>
             <form action="controller?page=admin.jsp" method="post">
                 <input type="hidden" name="command" value="ADD_SPORT_TYPE_COMMAND">
@@ -79,7 +95,9 @@
     <c:choose>
         <c:when test="${param.command eq 'GET_ALL_PARTICIPANTS_COMMAND'}">
             <c:forEach var="participant" items="${requestScope['participants']}">
-                <p>${participant.name}</p>
+                <div class="item">
+                <p><fmt:message key="admin_panel_name_participant"/>: ${participant.name}</p>
+                </div>
             </c:forEach>
             <form action="controller?page=admin.jsp" method="post">
                 <input type="hidden" name="command" value="ADD_PARTICIPANT_COMMAND">
@@ -91,10 +109,10 @@
     <c:choose>
         <c:when test="${param.command eq 'GET_ALL_TOURNAMENTS_COMMAND'}">
             <c:forEach var="tournament" varStatus="loop" items="${requestScope['tournaments']}">
-                <div>
-                    <p>${tournament.name}</p>
-                    <p>${tournament.description}</p>
-                    <p>${requestScope['currSportTypes'][loop.index].name}</p>
+                <div class="item">
+                    <p><fmt:message key="admin_panel_name_tournament"/>: ${tournament.name}</p>
+                    <p><fmt:message key="admin_panel_description"/>: ${tournament.description}</p>
+                    <p><fmt:message key="admin_panel_name_sportType"/>: ${requestScope['currSportTypes'][loop.index].name}</p>
                 </div>
             </c:forEach>
             <form action="controller?page=admin.jsp" method="post">
@@ -113,9 +131,9 @@
     <c:choose>
         <c:when test="${param.command eq 'GET_ALL_BET_TYPE_COMMAND'}">
             <c:forEach var="betType" items="${requestScope['betTypes']}">
-                <div>
-                    <p>${betType.name}</p>
-                    <p>${betType.description}</p>
+                <div class="item">
+                    <p><fmt:message key="admin_panel_name_betType"/>: ${betType.name}</p>
+                    <p><fmt:message key="admin_panel_description"/>: ${betType.description}</p>
                 </div>
             </c:forEach>
         </c:when>
@@ -123,12 +141,12 @@
     <c:choose>
         <c:when test="${param.command eq 'GET_ALL_USERS_BET_COMMAND'}">
             <c:forEach var="usersBet" varStatus="loop" items="${requestScope['usersBets']}">
-                <div>
-                    <p>${usersBet.date}</p>
-                    <p>${usersBet.betAmount}</p>
-                    <p>${usersBet.winningAmount}</p>
-                    <p>${requestScope['users'][loop.index].login}</p>
-                    <p>${requestScope['users'][loop.index].email}</p>
+                <div class="item">
+                    <p><fmt:message key="admin_panel_date"/>:${usersBet.date}</p>
+                    <p><fmt:message key="admin_panel_betAmount"/>:${usersBet.betAmount}</p>
+                    <p><fmt:message key="admin_panel_winningAmount"/>${usersBet.winningAmount}</p>
+                    <p><fmt:message key="admin_panel_login"/>${requestScope['users'][loop.index].login}</p>
+                    <p><fmt:message key="admin_panel_email"/>${requestScope['users'][loop.index].email}</p>
                 </div>
             </c:forEach>
         </c:when>
@@ -136,7 +154,7 @@
     <c:choose>
         <c:when test="${param.command eq 'GET_ALL_EVENTS_COMMAND'}">
             <c:forEach var="event" varStatus="loop" items="${requestScope['events']}">
-                <div>
+                <div class="item">
                     <p>${event.name}</p>
                     <p>${event.description}</p>
                     <p>${event.start_date}</p>

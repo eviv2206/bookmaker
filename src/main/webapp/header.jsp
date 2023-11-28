@@ -5,7 +5,7 @@
 <fmt:setBundle basename="messages"/>
 <c:set value='${sessionScope.curruser}' var="user"/>
 
-<div>
+<div style="display: flex; gap: 10px; justify-content: center">
     <form action="controller" method="post">
         <input type="hidden" name="command" value="CHANGE_LOCALE_COMMAND">
         <select name="language" onchange="this.form.submit()">
