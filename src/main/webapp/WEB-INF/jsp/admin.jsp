@@ -43,9 +43,9 @@
 
 <h1><fmt:message key="admin_panel_heading"/></h1>
 
-<form id="adminForm" action="controller" method="POST">
+<form id="adminForm" action="controller?page=admin.jsp" method="POST">
     <select id="command" name="command" onchange="submitForm(this.value)">
-        <option>---</option>
+        <option disabled selected value><fmt:message key="admin_panel_choose"/></option>
         <option value="GET_ALL_EVENTS_COMMAND" ${param.command eq 'GET_ALL_EVENTS_COMMAND' ? 'selected' : ''}><fmt:message
                 key="admin_panel_view_events"/></option>
         <option value="GET_ALL_USERS_BET_COMMAND" ${param.command eq 'GET_ALL_USERS_BET_COMMAND' ? 'selected' : ''}>
@@ -68,7 +68,7 @@
                 <p>${sportType.name}</p>
                 <p>${sportType.description}</p>
             </c:forEach>
-            <form action="controller" method="post">
+            <form action="controller?page=admin.jsp" method="post">
                 <input type="hidden" name="command" value="ADD_SPORT_TYPE_COMMAND">
                 <input type="text" name="name" placeholder="name" required>
                 <input type="text" name="description" placeholder="description" required>
@@ -81,7 +81,7 @@
             <c:forEach var="participant" items="${requestScope['participants']}">
                 <p>${participant.name}</p>
             </c:forEach>
-            <form action="controller" method="post">
+            <form action="controller?page=admin.jsp" method="post">
                 <input type="hidden" name="command" value="ADD_PARTICIPANT_COMMAND">
                 <input type="text" name="name" placeholder="name" required>
                 <button type="submit"><fmt:message key="admin_panel_add"/></button>
@@ -97,7 +97,7 @@
                     <p>${requestScope['currSportTypes'][loop.index].name}</p>
                 </div>
             </c:forEach>
-            <form action="controller" method="post">
+            <form action="controller?page=admin.jsp" method="post">
                 <input type="hidden" name="command" value="ADD_TOURNAMENT_COMMAND">
                 <input type="text" name="name" placeholder="name" required>
                 <input type="text" name="description" placeholder="description" required>
@@ -146,7 +146,7 @@
                     <p>${requestScope['users'][loop.index].email}</p>
                 </div>
             </c:forEach>
-            <form action="controller" method="post">
+            <form action="controller?page=admin.jsp" method="post">
                 <input type="hidden" name="command" value="ADD_EVENT_COMMAND">
                 <input type="text" name="name" placeholder="name" required>
                 <input type="text" name="description" placeholder="description" required>

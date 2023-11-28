@@ -25,7 +25,7 @@ public class GetEventCommand implements ICommand {
         try {
             Event event = eventDAO.getEvent(id);
             req.setAttribute("event", event);
-            return JspPageName.EVENT_PAGE;
+            return JspPageName.BOOKMAKER_PAGE;
         } catch (DAOException e) {
             log.error(e.getMessage());
             req.setAttribute("error", e.getMessage());

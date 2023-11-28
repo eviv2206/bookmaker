@@ -14,7 +14,7 @@
         </select>
     </form>
     <c:if test="${not empty user}">
-        <form action="controller" method="post">
+        <form action="controller?page=login.jsp" method="post">
             <input type="hidden" name="command" value="LOGOUT_COMMAND">
             <button type="submit"><fmt:message key="logout_button"/></button>
         </form>
