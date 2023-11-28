@@ -4,6 +4,7 @@ import by.bsuir.bookmaker.beans.Participant;
 import by.bsuir.bookmaker.dao.IParticipantDAO;
 import by.bsuir.bookmaker.dao.exception.DAOException;
 import by.bsuir.bookmaker.dao.pool.impl.ConnectionPool;
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class SQLParticipantDAO implements IParticipantDAO {
-
+    private static final Logger log = Logger.getLogger(SQLParticipantDAO.class);
     private final ConnectionPool connectionPool = ConnectionPool.getInstance();
     @Override
     public void addParticipant(String name) throws DAOException {
@@ -23,6 +24,7 @@ public class SQLParticipantDAO implements IParticipantDAO {
             statement.setString(1, name);
             statement.executeUpdate();
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -45,6 +47,7 @@ public class SQLParticipantDAO implements IParticipantDAO {
                 return null;
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -65,6 +68,7 @@ public class SQLParticipantDAO implements IParticipantDAO {
                 throw new DAOException("No rows affected");
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -86,6 +90,7 @@ public class SQLParticipantDAO implements IParticipantDAO {
                 throw new DAOException("No rows affected");
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -107,6 +112,7 @@ public class SQLParticipantDAO implements IParticipantDAO {
             }
             return participants;
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {

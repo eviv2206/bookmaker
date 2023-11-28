@@ -12,11 +12,13 @@ import by.bsuir.bookmaker.service.ICommand;
 
 import by.bsuir.bookmaker.service.impl.sportType.GetAllSportTypeCommand;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GetAllTournamentCommand implements ICommand {
+    private static final Logger log = Logger.getLogger(GetAllTournamentCommand.class);
     private final ITournamentDAO tournamentDAO = DAOFactory.getInstance().getTournamentDAO();
     private final ISportTypeDAO sportTypeDAO = DAOFactory.getInstance().getSportTypeDAO();
 
@@ -38,6 +40,7 @@ public class GetAllTournamentCommand implements ICommand {
                 new GetAllSportTypeCommand().execute(req);
             }
         } catch (DAOException e) {
+            log.error(e.getMessage());
             req.setAttribute("error", e.getMessage());
             return JspPageName.ERROR_PAGE;
         }

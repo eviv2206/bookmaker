@@ -4,6 +4,7 @@ import by.bsuir.bookmaker.beans.User;
 import by.bsuir.bookmaker.dao.IAuthDAO;
 import by.bsuir.bookmaker.dao.exception.DAOException;
 import by.bsuir.bookmaker.dao.pool.impl.ConnectionPool;
+import org.apache.log4j.Logger;
 
 import java.sql.*;
 
@@ -13,6 +14,8 @@ import java.sql.*;
  * @version 1.0
  */
 public class SQLAuthDAO implements IAuthDAO {
+
+    private static final Logger log = Logger.getLogger(SQLAuthDAO.class);
     private final ConnectionPool connectionPool = ConnectionPool.getInstance();
 
     /**
@@ -44,6 +47,7 @@ public class SQLAuthDAO implements IAuthDAO {
                 }
             }
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new RuntimeException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -73,6 +77,7 @@ public class SQLAuthDAO implements IAuthDAO {
 
             statement.executeUpdate();
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException("Email or login is already used");
         } finally {
             if (connectionPool != null) {
@@ -104,6 +109,7 @@ public class SQLAuthDAO implements IAuthDAO {
                 return null;
             }
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new DAOException("User with such id doesn't exist");
         } finally {
             if (connectionPool != null) {

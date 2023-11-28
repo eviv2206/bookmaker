@@ -8,8 +8,10 @@ import by.bsuir.bookmaker.dao.factory.DAOFactory;
 import by.bsuir.bookmaker.service.ICommand;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.log4j.Logger;
 
 public class AddSportTypeCommand implements ICommand {
+    private static final Logger log = Logger.getLogger(AddSportTypeCommand.class);
     public static final ISportTypeDAO sportTypeDAO = DAOFactory.getInstance().getSportTypeDAO();
 
     @Override
@@ -23,6 +25,7 @@ public class AddSportTypeCommand implements ICommand {
         try {
             sportTypeDAO.addSportType(name, description);
         } catch (DAOException e) {
+            log.error(e.getMessage());
             req.setAttribute("error", e.getMessage());
             return JspPageName.ERROR_PAGE;
         }

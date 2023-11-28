@@ -4,6 +4,7 @@ import by.bsuir.bookmaker.beans.Event;
 import by.bsuir.bookmaker.dao.IEventDAO;
 import by.bsuir.bookmaker.dao.exception.DAOException;
 import by.bsuir.bookmaker.dao.pool.impl.ConnectionPool;
+import org.apache.log4j.Logger;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import java.util.List;
  * @version 1.0
  */
 public class SQLEventDAO implements IEventDAO {
-
+    private static final Logger log = Logger.getLogger(SQLEventDAO.class);
     private static final ConnectionPool connectionPool = ConnectionPool.getInstance();
 
     /**
@@ -53,6 +54,7 @@ public class SQLEventDAO implements IEventDAO {
                 }
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -81,6 +83,7 @@ public class SQLEventDAO implements IEventDAO {
                 return null;
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -123,6 +126,7 @@ public class SQLEventDAO implements IEventDAO {
                 }
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -145,6 +149,7 @@ public class SQLEventDAO implements IEventDAO {
             statement.setString(1, String.valueOf(id));
             statement.executeUpdate();
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -171,6 +176,7 @@ public class SQLEventDAO implements IEventDAO {
             }
             return events;
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {

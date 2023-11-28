@@ -4,6 +4,7 @@ import by.bsuir.bookmaker.beans.BetTypeEvent;
 import by.bsuir.bookmaker.dao.IBetTypeEventDAO;
 import by.bsuir.bookmaker.dao.exception.DAOException;
 import by.bsuir.bookmaker.dao.pool.impl.ConnectionPool;
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,6 +17,7 @@ import java.sql.SQLException;
  * @version 1.0
  */
 public class SQLBetTypeEventDAO implements IBetTypeEventDAO {
+    private static final Logger log = Logger.getLogger(SQLBetTypeEventDAO.class);
     private final ConnectionPool connectionPool = ConnectionPool.getInstance();
 
     /**
@@ -38,6 +40,7 @@ public class SQLBetTypeEventDAO implements IBetTypeEventDAO {
                 return null;
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {

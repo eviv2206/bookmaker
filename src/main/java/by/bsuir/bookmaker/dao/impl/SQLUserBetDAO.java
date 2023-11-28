@@ -4,6 +4,7 @@ import by.bsuir.bookmaker.beans.UserBet;
 import by.bsuir.bookmaker.dao.IUserBetDAO;
 import by.bsuir.bookmaker.dao.exception.DAOException;
 import by.bsuir.bookmaker.dao.pool.impl.ConnectionPool;
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 public class SQLUserBetDAO implements IUserBetDAO {
+    private static final Logger log = Logger.getLogger(SQLUserBetDAO.class);
     private static final ConnectionPool connectionPool = ConnectionPool.getInstance();
     @Override
     public void addUserBet(Date date, int betAmount, double winAmount, int userId, int betTypeEventId) throws DAOException {
@@ -26,6 +28,7 @@ public class SQLUserBetDAO implements IUserBetDAO {
             statement.setInt(4, betTypeEventId);
             statement.setInt(5, userId);
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -48,6 +51,7 @@ public class SQLUserBetDAO implements IUserBetDAO {
                 return null;
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -69,6 +73,7 @@ public class SQLUserBetDAO implements IUserBetDAO {
             }
             return userBets;
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -91,6 +96,7 @@ public class SQLUserBetDAO implements IUserBetDAO {
             }
             return userBets;
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         }
     }

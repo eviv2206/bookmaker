@@ -4,6 +4,7 @@ import by.bsuir.bookmaker.beans.SportType;
 import by.bsuir.bookmaker.dao.ISportTypeDAO;
 import by.bsuir.bookmaker.dao.exception.DAOException;
 import by.bsuir.bookmaker.dao.pool.impl.ConnectionPool;
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class SQLSportTypeDAO implements ISportTypeDAO {
-
+    private static final Logger log = Logger.getLogger(SQLSportTypeDAO.class);
     private final ConnectionPool connectionPool = ConnectionPool.getInstance();
 
     @Override
@@ -25,6 +26,7 @@ public class SQLSportTypeDAO implements ISportTypeDAO {
             statement.setString(2, description);
             statement.executeUpdate();
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -47,6 +49,7 @@ public class SQLSportTypeDAO implements ISportTypeDAO {
                 return null;
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -67,6 +70,7 @@ public class SQLSportTypeDAO implements ISportTypeDAO {
                 throw new DAOException("No rows affected");
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -88,6 +92,7 @@ public class SQLSportTypeDAO implements ISportTypeDAO {
             }
             return sportTypes;
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -110,6 +115,7 @@ public class SQLSportTypeDAO implements ISportTypeDAO {
                 throw new DAOException("No rows affected");
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {

@@ -12,11 +12,13 @@ import by.bsuir.bookmaker.dao.exception.DAOException;
 import by.bsuir.bookmaker.dao.factory.DAOFactory;
 import by.bsuir.bookmaker.service.ICommand;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GetAllEventsCommand implements ICommand {
+    private static final Logger log = Logger.getLogger(GetAllEventsCommand.class);
     private static final IEventDAO eventDAO = DAOFactory.getInstance().getEventDAO();
     private static final IParticipantDAO participantDAO = DAOFactory.getInstance().getParticipantDAO();
     private static final ITournamentDAO tournamentDAO = DAOFactory.getInstance().getTournamentDAO();
@@ -46,6 +48,7 @@ public class GetAllEventsCommand implements ICommand {
             req.setAttribute("tournaments", tournaments);
             req.setAttribute("winners", winners);
         } catch (DAOException e) {
+            log.error(e.getMessage());
             req.setAttribute("error", e.getMessage());
             return JspPageName.ERROR_PAGE;
         }

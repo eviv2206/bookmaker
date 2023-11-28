@@ -9,9 +9,10 @@ import by.bsuir.bookmaker.service.ICommand;
 
 import by.bsuir.bookmaker.service.impl.sportType.GetSportTypeCommand;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.log4j.Logger;
 
 public class GetTournamentCommand implements ICommand {
-
+    private static final Logger log = Logger.getLogger(GetTournamentCommand.class);
     private final ITournamentDAO tournamentDAO = DAOFactory.getInstance().getTournamentDAO();
 
     @Override
@@ -25,6 +26,7 @@ public class GetTournamentCommand implements ICommand {
             req.setAttribute("tournament", tournamentDAO.getTournament(tournamentID));
             return new GetSportTypeCommand().execute(req);
         } catch (DAOException e){
+            log.error(e.getMessage());
             req.setAttribute("error", e.getMessage());
             return JspPageName.ERROR_PAGE;
         }

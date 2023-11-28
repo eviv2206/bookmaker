@@ -13,11 +13,13 @@ import by.bsuir.bookmaker.dao.exception.DAOException;
 import by.bsuir.bookmaker.dao.factory.DAOFactory;
 import by.bsuir.bookmaker.service.ICommand;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GetAllUsersBetCommand implements ICommand {
+    private static final Logger log = Logger.getLogger(GetAllUsersBetCommand.class);
     private static final IUserBetDAO userBetDAO = DAOFactory.getInstance().getUserBetDAO();
     private static final IAuthDAO authDAO = DAOFactory.getInstance().getAuthDAO();
     private static final IBetTypeEventDAO betTypeEventDAO = DAOFactory.getInstance().getBetTypeEventDAO();
@@ -47,6 +49,7 @@ public class GetAllUsersBetCommand implements ICommand {
             }
             req.setAttribute("betTypes", betTypes);
         } catch (DAOException e) {
+            log.error(e.getMessage());
             req.setAttribute("error", e.getMessage());
             return JspPageName.ERROR_PAGE;
         }

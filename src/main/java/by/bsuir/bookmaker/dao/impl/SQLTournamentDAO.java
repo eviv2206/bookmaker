@@ -4,6 +4,7 @@ import by.bsuir.bookmaker.beans.Tournament;
 import by.bsuir.bookmaker.dao.ITournamentDAO;
 import by.bsuir.bookmaker.dao.exception.DAOException;
 import by.bsuir.bookmaker.dao.pool.impl.ConnectionPool;
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class SQLTournamentDAO implements ITournamentDAO {
-
+    private static final Logger log = Logger.getLogger(SQLTournamentDAO.class);
     private final ConnectionPool connectionPool = ConnectionPool.getInstance();
 
     @Override
@@ -26,6 +27,7 @@ public class SQLTournamentDAO implements ITournamentDAO {
             statement.setString(3, String.valueOf(sportTypeID));
             statement.executeUpdate();
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -48,6 +50,7 @@ public class SQLTournamentDAO implements ITournamentDAO {
                 return null;
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -68,6 +71,7 @@ public class SQLTournamentDAO implements ITournamentDAO {
                 throw new DAOException("No rows affected");
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -91,6 +95,7 @@ public class SQLTournamentDAO implements ITournamentDAO {
                 throw new DAOException("No rows affected");
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
@@ -112,6 +117,7 @@ public class SQLTournamentDAO implements ITournamentDAO {
             }
             return tournaments;
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
             if (connectionPool != null) {
