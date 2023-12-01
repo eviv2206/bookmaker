@@ -15,7 +15,7 @@ public class DeleteSportTypeCommand implements ICommand {
     public static final ISportTypeDAO sportTypeDAO = DAOFactory.getInstance().getSportTypeDAO();
     @Override
     public String execute(HttpServletRequest req) {
-        User user = (User) req.getSession().getAttribute("user");
+        User user = (User) req.getSession().getAttribute("curruser");
         if (user == null || !user.isPrivileges()) {
             return JspPageName.LOGIN_PAGE;
         }

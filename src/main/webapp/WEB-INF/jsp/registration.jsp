@@ -47,7 +47,8 @@
   <p class="error">${error}</p>
 </c:if>
 
-<form action="controller" method="post">
+<form action="controller?page=login.jsp" method="post">
+  <input type="hidden" name="command" value="REGISTER_COMMAND">
   <label for="login"><fmt:message key="login_label"/></label>
   <input type="text" id="login" name="login" required>
   <br>

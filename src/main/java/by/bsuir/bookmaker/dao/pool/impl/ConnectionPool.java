@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * @author eviv2206
+ * @version 1.0
+ */
 public class ConnectionPool implements IConnectionPool {
 
     static {
@@ -43,6 +47,10 @@ public class ConnectionPool implements IConnectionPool {
         }
     }
 
+    /**
+     * Create connection
+     * @return connection
+     */
     private Connection createConnection() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");

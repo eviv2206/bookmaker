@@ -1,5 +1,6 @@
 package by.bsuir.bookmaker.beans;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,13 +9,13 @@ public class Event {
     private int id;
     private String name;
     private String description;
-    private Date start_time;
+    private LocalDateTime start_time;
     private String result;
     private int tournamentID;
     private int winnerID;
     private List<Integer> participantsIDs;
 
-    public Event(int id, String name, String description, Date start_time, String result, int tournamentID, int winnerID, List<Integer> participantsIDs) {
+    public Event(int id, String name, String description, LocalDateTime start_time, String result, int tournamentID, int winnerID, List<Integer> participantsIDs) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -37,7 +38,7 @@ public class Event {
         return description;
     }
 
-    public Date getStart_time() {
+    public LocalDateTime getStart_time() {
         return start_time;
     }
 

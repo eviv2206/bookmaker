@@ -11,6 +11,9 @@ import org.apache.log4j.Logger;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -21,19 +24,18 @@ public class AddEventCommand implements ICommand {
 
     @Override
     public String execute(HttpServletRequest req) {
-        User user = (User) req.getSession().getAttribute("user");
+        User user = (User) req.getSession().getAttribute("curruser");
         if (user == null || !user.isPrivileges()) {
             return JspPageName.LOGIN_PAGE;
         }
         String name = req.getParameter("name");
         String description = req.getParameter("description");
-        Date date = transformToDateTime(req.getParameter("date"));
+        LocalDateTime date = transformToDateTime(req.getParameter("start_time"));
         String result = req.getParameter("result");
         int tournamentID = Integer.parseInt(req.getParameter("tournamentID"));
-        int winnerID = Integer.parseInt(req.getParameter("winnerID"));
         Integer[] participants = convertStringArrayToIntegerArray(req.getParameterValues("participants"));
         try {
-            eventDAO.addEvent(name, description, date, result, tournamentID, Arrays.asList(participants), winnerID);
+            eventDAO.addEvent(name, description, date, result, tournamentID, Arrays.asList(participants));
         } catch (DAOException e) {
             log.error(e.getMessage());
             req.setAttribute("error", e.getMessage());
@@ -42,11 +44,11 @@ public class AddEventCommand implements ICommand {
         return JspPageName.ADMIN_PAGE;
     }
 
-    private Date transformToDateTime(String str) {
-        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private LocalDateTime transformToDateTime(String str) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         try {
-            return dateTimeFormat.parse(str);
-        } catch (ParseException e) {
+            return LocalDateTime.parse(str, formatter);
+        } catch (Exception e) {
             log.error(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }

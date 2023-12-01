@@ -1,27 +1,26 @@
-package by.bsuir.bookmaker.service.impl.tournament;
+package by.bsuir.bookmaker.service.impl.participants;
 
 import by.bsuir.bookmaker.beans.User;
 import by.bsuir.bookmaker.controller.JspPageName;
-import by.bsuir.bookmaker.dao.ITournamentDAO;
+import by.bsuir.bookmaker.dao.IParticipantDAO;
 import by.bsuir.bookmaker.dao.exception.DAOException;
 import by.bsuir.bookmaker.dao.factory.DAOFactory;
 import by.bsuir.bookmaker.service.ICommand;
-
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 
-public class DeleteTournamentCommand implements ICommand {
-    private static final Logger log = Logger.getLogger(DeleteTournamentCommand.class);
-    public static final ITournamentDAO tournamentDAO = DAOFactory.getInstance().getTournamentDAO();
+public class DeleteParticipantCommand implements ICommand {
+    private static final Logger log = Logger.getLogger(DeleteParticipantCommand.class);
+    private static final IParticipantDAO participantsDAO = DAOFactory.getInstance().getParticipantDAO();
     @Override
     public String execute(HttpServletRequest req) {
         User user = (User) req.getSession().getAttribute("curruser");
         if (user == null || !user.isPrivileges()) {
             return JspPageName.LOGIN_PAGE;
         }
-        String tournamentID = req.getParameter("tournamentID");
+        String participantID = req.getParameter("participantID");
         try {
-            tournamentDAO.deleteTournament(Integer.parseInt(tournamentID));
+            participantsDAO.deleteParticipant(Integer.parseInt(participantID));
         } catch (DAOException e) {
             log.error(e.getMessage());
             req.setAttribute("error", e.getMessage());

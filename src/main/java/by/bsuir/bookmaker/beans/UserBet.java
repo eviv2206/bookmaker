@@ -1,20 +1,23 @@
 package by.bsuir.bookmaker.beans;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class UserBet {
     private int id;
-    private Date date;
+    private LocalDateTime date;
     private int betAmount;
     private double winningAmount;
+    private String score;
     private int betTypeEventID;
     private int userID;
 
-    public UserBet(int id, Date date, int betAmount, double winningAmount, int betTypeEventID, int userID) {
+    public UserBet(int id, LocalDateTime date, int betAmount, double winningAmount, String score, int betTypeEventID, int userID) {
         this.id = id;
         this.date = date;
         this.betAmount = betAmount;
         this.winningAmount = winningAmount;
+        this.score = score;
         this.betTypeEventID = betTypeEventID;
         this.userID = userID;
     }
@@ -27,11 +30,11 @@ public class UserBet {
         this.id = id;
     }
 
-    public Date getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 
@@ -65,5 +68,9 @@ public class UserBet {
 
     public void setUserID(int userID) {
         this.userID = userID;
+    }
+
+    public String getScore() {
+        return score;
     }
 }

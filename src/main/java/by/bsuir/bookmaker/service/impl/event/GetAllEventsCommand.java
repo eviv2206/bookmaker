@@ -43,9 +43,11 @@ public class GetAllEventsCommand implements ICommand {
                 tournaments.add(tournamentDAO.getTournament(event.getTournamentID()));
                 winners.add(participantDAO.getParticipant(event.getWinnerID()));
             }
-            req.setAttribute("allParticipants", participantDAO.getAllParticipants());
+            ArrayList<Participant> allParticipants = participantDAO.getAllParticipants();
+            req.setAttribute("allParticipants", allParticipants);
             req.setAttribute("participants", participants);
             req.setAttribute("tournaments", tournaments);
+            req.setAttribute("allTournaments", tournamentDAO.getAllTournaments());
             req.setAttribute("winners", winners);
         } catch (DAOException e) {
             log.error(e.getMessage());

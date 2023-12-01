@@ -4,9 +4,11 @@ import by.bsuir.bookmaker.beans.Event;
 import by.bsuir.bookmaker.dao.IEventDAO;
 import by.bsuir.bookmaker.dao.exception.DAOException;
 import by.bsuir.bookmaker.dao.pool.impl.ConnectionPool;
+import com.mysql.cj.exceptions.ConnectionIsClosedException;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -29,26 +31,27 @@ public class SQLEventDAO implements IEventDAO {
      * @param result
      * @param tournamentID
      * @param participants
-     * @param winnerID
      * @throws DAOException
      */
     @Override
-    public void addEvent(String name, String description, Date date, String result, int tournamentID, List<Integer> participants, int winnerID) throws DAOException {
+    public void addEvent(String name, String description, LocalDateTime date, String result, int tournamentID, List<Integer> participants) throws DAOException {
         Connection connection = null;
         try {
             connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO event(e_name, e_description, e_start_time, e_result, e_t_id, e_p_id_winner) VALUES(?,?,?,?,?,?)");
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO event(e_name, e_description, e_start_time, e_result, e_t_id, e_p_id_winner) VALUES(?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, name);
             statement.setString(2, description);
-            statement.setDate(3, new java.sql.Date(date.getTime()));
+            statement.setObject(3, date);
             statement.setString(4, result);
             statement.setString(5, String.valueOf(tournamentID));
-            statement.setString(6, String.valueOf(winnerID));
-            ResultSet res = statement.executeQuery();
+            statement.setString(6, null);
+            statement.executeUpdate();
+            ResultSet res = statement.getGeneratedKeys();
             if (res.next()){
+                int generatedEventId = res.getInt(1);
                 for (Integer participantId : participants) {
                     PreparedStatement participantStatement = connection.prepareStatement("INSERT INTO event_m2m_participant (e_p_e_id, e_p_p_id) VALUES (?, ?)");
-                    participantStatement.setString(1, String.valueOf(res.getString("e_id")));
+                    participantStatement.setInt(1, generatedEventId);
                     participantStatement.setInt(2, participantId);
                     participantStatement.executeUpdate();
                 }
@@ -74,11 +77,13 @@ public class SQLEventDAO implements IEventDAO {
         Connection connection = null;
         try {
             connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM event JOIN event_m2m_participant ON event.e_id = event_m2m_participant.e_p_e_id WHERE e_id=?");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM event\n" +
+                    "JOIN event_m2m_participant ON event.e_id = event_m2m_participant.e_p_e_id\n" +
+                    "WHERE event.e_id = ?;\n");
             statement.setInt(1, id);
             ResultSet set = statement.executeQuery();
             if (set.next()) {
-                return extractEventFromResultSet(set);
+                return extractEventFromResultSet(connection, set);
             } else {
                 return null;
             }
@@ -105,18 +110,20 @@ public class SQLEventDAO implements IEventDAO {
      * @throws DAOException
      */
     @Override
-    public void updateEvent(String name, String description, Date date, String result, int tournamentID, List<Integer> participants, int winnerID, int id) throws DAOException {
+    public void updateEvent(String name, String description, LocalDateTime date, String result, int tournamentID, List<Integer> participants, int winnerID, int id) throws DAOException {
         Connection connection = null;
         try {
             connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("UPDATE event SET e_name=?, e_description=?, e_start_time=?, e_result=?, e_t_id=?, e_p_id_winner=? WHERE e_id=?");
+            PreparedStatement statement = connection.prepareStatement("UPDATE event SET e_name=?, e_description=?, e_start_time=?, e_result=?, e_t_id=?, e_p_id_winner=? WHERE e_id=?", Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, name);
             statement.setString(2, description);
-            statement.setDate(3, new java.sql.Date(date.getTime()));
+            statement.setObject(3, date);
             statement.setString(4, result);
             statement.setString(5, String.valueOf(tournamentID));
             statement.setString(6, String.valueOf(winnerID));
-            ResultSet res = statement.executeQuery();
+            statement.setInt(7, id);
+            statement.executeUpdate();
+            ResultSet res = statement.getGeneratedKeys();
             if (res.next()){
                 for (Integer participantId : participants) {
                     PreparedStatement participantStatement = connection.prepareStatement("INSERT INTO event_m2m_participant (e_p_e_id, e_p_p_id) VALUES (?, ?)");
@@ -146,7 +153,7 @@ public class SQLEventDAO implements IEventDAO {
         try {
             connection = connectionPool.getConnection();
             PreparedStatement statement = connection.prepareStatement("DELETE FROM event WHERE e_id=?");
-            statement.setString(1, String.valueOf(id));
+            statement.setInt(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
             log.error(e.getMessage());
@@ -172,7 +179,7 @@ public class SQLEventDAO implements IEventDAO {
             ResultSet res = statement.executeQuery();
             ArrayList<Event> events = new ArrayList<>();
             while (res.next()){
-                events.add(extractEventFromResultSet(res));
+                events.add(extractEventFromResultSet(connection, res));
             }
             return events;
         } catch (SQLException e) {
@@ -191,16 +198,21 @@ public class SQLEventDAO implements IEventDAO {
      * @return Event
      * @throws SQLException
      */
-    private Event extractEventFromResultSet(ResultSet set) throws SQLException {
+    private Event extractEventFromResultSet(Connection con, ResultSet set) throws SQLException {
+        PreparedStatement statement = con.prepareStatement("SELECT * FROM event_m2m_participant WHERE e_p_e_id=?");
         final int id = set.getInt("e_id");
         final String name = set.getString("e_name");
         final String description = set.getString("e_description");
-        final Date start_date = set.getDate("e_start_time");
+        final LocalDateTime start_date = set.getObject("e_start_time", LocalDateTime.class);
         final String result = set.getString("e_result");
         final int tournamentID = set.getInt("e_t_id");
-        final int winnerID = set.getInt("e_w_id");
-        Array participantArray = set.getArray("e_p_p_id");
-        Integer[] participantIDs = (Integer[])participantArray.getArray();
-        return new Event(id, name, description, start_date, result, tournamentID, winnerID, Arrays.asList(participantIDs));
+        final int winnerID = set.getInt("e_p_id_winner");
+        final List<Integer> participantIDs = new ArrayList<>();
+        statement.setInt(1, id);
+        ResultSet resM2M = statement.executeQuery();
+        while (resM2M.next()) {
+            participantIDs.add(resM2M.getInt("e_p_p_id"));
+        }
+        return new Event(id, name, description, start_date, result, tournamentID, winnerID, participantIDs);
     }
 }

@@ -12,10 +12,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+/**
+ * @author eviv2206
+ * @version 1.0
+ */
 public class SQLSportTypeDAO implements ISportTypeDAO {
     private static final Logger log = Logger.getLogger(SQLSportTypeDAO.class);
     private final ConnectionPool connectionPool = ConnectionPool.getInstance();
 
+    /**
+     * Method of adding sport type
+     * @param name
+     * @param description
+     * @throws DAOException
+     */
     @Override
     public void addSportType(String name, String description) throws DAOException {
         Connection connection = null;
@@ -35,6 +45,12 @@ public class SQLSportTypeDAO implements ISportTypeDAO {
         }
     }
 
+    /**
+     * Method of getting sport type
+     * @param sportID
+     * @return SportType
+     * @throws DAOException
+     */
     @Override
     public SportType getSportType(int sportID) throws DAOException {
         Connection connection = null;
@@ -58,6 +74,11 @@ public class SQLSportTypeDAO implements ISportTypeDAO {
         }
     }
 
+    /**
+     * Method of deleting sport type
+     * @param sportID
+     * @throws DAOException
+     */
     @Override
     public void deleteSportType(int sportID) throws DAOException {
         Connection connection = null;
@@ -79,6 +100,11 @@ public class SQLSportTypeDAO implements ISportTypeDAO {
         }
     }
 
+    /**
+     * Method of getting all sport types
+     * @return ArrayList<SportType>
+     * @throws DAOException
+     */
     @Override
     public ArrayList<SportType> getAllSportTypes() throws DAOException {
         Connection connection = null;
@@ -101,6 +127,13 @@ public class SQLSportTypeDAO implements ISportTypeDAO {
         }
     }
 
+    /**
+     * Method of updating sport type
+     * @param name
+     * @param description
+     * @param sportID
+     * @throws DAOException
+     */
     @Override
     public void updateSportType(String name, String description, int sportID) throws DAOException {
         Connection connection = null;

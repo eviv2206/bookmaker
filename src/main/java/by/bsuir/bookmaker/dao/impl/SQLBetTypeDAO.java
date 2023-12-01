@@ -83,9 +83,9 @@ public class SQLBetTypeDAO implements IBetTypeDAO {
      * @throws SQLException
      */
     private BetType extractBetTypeFromResultSet(ResultSet res) throws SQLException {
-        final int id = res.getInt("s_t_id");
-        final String name = res.getString("s_t_name");
-        final String description = res.getString("s_t_description");
+        final int id = res.getInt("b_t_id");
+        final String name = res.getString("b_t_name");
+        final String description = res.getString("b_t_description");
         return new BetType(id, name, description);
     }
 }

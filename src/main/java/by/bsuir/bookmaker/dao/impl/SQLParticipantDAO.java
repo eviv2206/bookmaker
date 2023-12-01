@@ -12,9 +12,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+/**
+ * @author eviv2206
+ * @version 1.0
+ */
 public class SQLParticipantDAO implements IParticipantDAO {
     private static final Logger log = Logger.getLogger(SQLParticipantDAO.class);
     private final ConnectionPool connectionPool = ConnectionPool.getInstance();
+
+    /**
+     * Method of adding participant
+     * @param name
+     * @throws DAOException
+     */
     @Override
     public void addParticipant(String name) throws DAOException {
         Connection connection = null;
@@ -33,6 +43,12 @@ public class SQLParticipantDAO implements IParticipantDAO {
         }
     }
 
+    /**
+     * Method of getting participant
+     * @param id
+     * @return Participant
+     * @throws DAOException
+     */
     @Override
     public Participant getParticipant(int id) throws DAOException {
         Connection connection = null;
@@ -56,6 +72,11 @@ public class SQLParticipantDAO implements IParticipantDAO {
         }
     }
 
+    /**
+     * Method of deleting participant
+     * @param id
+     * @throws DAOException
+     */
     @Override
     public void deleteParticipant(int id) throws DAOException {
         Connection connection = null;
@@ -77,6 +98,12 @@ public class SQLParticipantDAO implements IParticipantDAO {
         }
     }
 
+    /**
+     * Method of updating participant
+     * @param name
+     * @param id
+     * @throws DAOException
+     */
     @Override
     public void updateParticipant(String name, int id) throws DAOException {
         Connection connection = null;
@@ -99,6 +126,11 @@ public class SQLParticipantDAO implements IParticipantDAO {
         }
     }
 
+    /**
+     * Method of getting all participants
+     * @return ArrayList<Participant>
+     * @throws DAOException
+     */
     @Override
     public ArrayList<Participant> getAllParticipants() throws DAOException {
         Connection connection = null;

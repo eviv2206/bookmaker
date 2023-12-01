@@ -12,10 +12,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+/**
+ * @author eviv2206
+ * @version 1.0
+ */
 public class SQLTournamentDAO implements ITournamentDAO {
     private static final Logger log = Logger.getLogger(SQLTournamentDAO.class);
     private final ConnectionPool connectionPool = ConnectionPool.getInstance();
 
+    /**
+     * Method of adding tournament
+     * @param name
+     * @param description
+     * @param sportTypeID
+     * @throws DAOException
+     */
     @Override
     public void addTournament(String name, String description, int sportTypeID) throws DAOException {
         Connection connection = null;
@@ -36,6 +47,12 @@ public class SQLTournamentDAO implements ITournamentDAO {
         }
     }
 
+    /**
+     * Method of getting tournament
+     * @param tournamentID
+     * @return Tournament
+     * @throws DAOException
+     */
     @Override
     public Tournament getTournament(int tournamentID) throws DAOException {
         Connection connection = null;
@@ -59,6 +76,11 @@ public class SQLTournamentDAO implements ITournamentDAO {
         }
     }
 
+    /**
+     * Method of deleting tournament
+     * @param tournamentID
+     * @throws DAOException
+     */
     @Override
     public void deleteTournament(int tournamentID) throws DAOException {
         Connection connection = null;
@@ -80,6 +102,14 @@ public class SQLTournamentDAO implements ITournamentDAO {
         }
     }
 
+    /**
+     * Method of updating tournament
+     * @param name
+     * @param description
+     * @param sportTypeID
+     * @param tournamentID
+     * @throws DAOException
+     */
     @Override
     public void updateTournament(String name, String description, int sportTypeID, int tournamentID) throws DAOException {
         Connection connection = null;
@@ -104,6 +134,11 @@ public class SQLTournamentDAO implements ITournamentDAO {
         }
     }
 
+    /**
+     * Method of getting all tournaments
+     * @return ArrayList<Tournament>
+     * @throws DAOException
+     */
     @Override
     public ArrayList<Tournament> getAllTournaments() throws DAOException {
         Connection connection = null;
