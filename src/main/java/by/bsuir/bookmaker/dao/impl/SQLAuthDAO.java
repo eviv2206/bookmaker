@@ -26,14 +26,13 @@ public class SQLAuthDAO implements IAuthDAO {
      */
     @Override
     public User getUser(String login, String password) {
-        Connection connection = null;
-        PreparedStatement statement = null;
         User user = null;
-        try {
-            connection = connectionPool.getConnection();
-            statement = connection.prepareStatement("SELECT * FROM user WHERE u_login=?");
+        ResultSet resultSet = null;
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM user WHERE u_login=?")
+             ) {
             statement.setString(1, login);
-            ResultSet resultSet = statement.executeQuery();
+            resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 if (User.createPasswordHash(password) == resultSet.getInt("u_password")) {
                     final int id = resultSet.getInt("u_id");
@@ -50,8 +49,12 @@ public class SQLAuthDAO implements IAuthDAO {
             log.error(e.getMessage());
             throw new RuntimeException(e.getMessage());
         } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
+            if (resultSet != null) {
+                try {
+                    resultSet.close();
+                } catch (SQLException e) {
+                    log.error(e.getMessage());
+                }
             }
         }
         return user;
@@ -66,10 +69,7 @@ public class SQLAuthDAO implements IAuthDAO {
      */
     @Override
     public void createUser(String login, String password, String email) throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO user (u_login, u_password, u_email, u_privileges) VALUES (?, ?, ?, ?)");
+        try (Connection connection = connectionPool.getConnection(); PreparedStatement statement = connection.prepareStatement("INSERT INTO user (u_login, u_password, u_email, u_privileges) VALUES (?, ?, ?, ?)")) {
             statement.setString(1, login);
             statement.setInt(2, User.createPasswordHash(password));
             statement.setString(3, email);
@@ -79,10 +79,6 @@ public class SQLAuthDAO implements IAuthDAO {
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new DAOException("Email or login is already used");
-        } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
-            }
         }
     }
 
@@ -94,10 +90,7 @@ public class SQLAuthDAO implements IAuthDAO {
      */
     @Override
     public User getUserById(int id) throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM user WHERE u_id=?");
+        try (Connection connection = connectionPool.getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM user WHERE u_id=?")){
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -111,9 +104,6 @@ public class SQLAuthDAO implements IAuthDAO {
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new DAOException("User with such id doesn't exist");
-        } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
-        }}
+        }
     }
 }

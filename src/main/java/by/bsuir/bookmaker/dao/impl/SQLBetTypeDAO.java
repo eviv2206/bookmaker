@@ -30,22 +30,25 @@ public class SQLBetTypeDAO implements IBetTypeDAO {
      */
     @Override
     public BetType getBetType(int betTypeID) throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM bet_type WHERE b_t_id=?");
+        ResultSet res = null;
+        try(Connection connection = connectionPool.getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM bet_type WHERE b_t_id=?")) {
             statement.setString(1, String.valueOf(betTypeID));
-            ResultSet res = statement.executeQuery();
+            res = statement.executeQuery();
             if (res.next()) {
                 return extractBetTypeFromResultSet(res);
             } else {
                 return null;
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
+            if (res != null) {
+                try {
+                    res.close();
+                } catch (SQLException e) {
+                    log.error(e.getMessage());
+                }
             }
         }
     }
@@ -57,21 +60,24 @@ public class SQLBetTypeDAO implements IBetTypeDAO {
      */
     @Override
     public List<BetType> getAllBetTypes() throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("select * from bet_type ORDER BY b_t_id DESC");
-            ResultSet res = statement.executeQuery();
+        ResultSet res = null;
+        try (Connection connection = connectionPool.getConnection(); PreparedStatement statement = connection.prepareStatement("select * from bet_type ORDER BY b_t_id DESC")) {
+            res = statement.executeQuery();
             ArrayList<BetType> betTypes = new ArrayList<>();
             while (res.next()){
                 betTypes.add(extractBetTypeFromResultSet(res));
             }
             return betTypes;
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
+            if (res != null) {
+                try {
+                    res.close();
+                } catch (SQLException e) {
+                    log.error(e.getMessage());
+                }
             }
         }
     }

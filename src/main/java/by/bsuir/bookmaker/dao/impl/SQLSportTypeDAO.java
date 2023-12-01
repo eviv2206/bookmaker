@@ -102,16 +102,15 @@ public class SQLSportTypeDAO implements ISportTypeDAO {
 
     /**
      * Method of getting all sport types
-     * @return ArrayList<SportType>
      * @throws DAOException
      */
     @Override
     public ArrayList<SportType> getAllSportTypes() throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("select * from sport_type ORDER BY s_t_name DESC");
-            ResultSet res = statement.executeQuery();
+        ResultSet res = null;
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement("select * from sport_type ORDER BY s_t_name DESC");
+        ) {
+            res = statement.executeQuery();
             ArrayList<SportType> sportTypes = new ArrayList<>();
             while (res.next()){
                 sportTypes.add(extractSportTypeFromResultSet(res));
@@ -121,8 +120,12 @@ public class SQLSportTypeDAO implements ISportTypeDAO {
             log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
+            if (res != null) {
+                try {
+                    res.close();
+                } catch (SQLException e) {
+                    log.error(e.getMessage());
+                }
             }
         }
     }
@@ -136,10 +139,9 @@ public class SQLSportTypeDAO implements ISportTypeDAO {
      */
     @Override
     public void updateSportType(String name, String description, int sportID) throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("UPDATE sport_type SET s_t_name=?, s_t_description=? WHERE s_t_id=?");
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement("UPDATE sport_type SET s_t_name=?, s_t_description=? WHERE s_t_id=?");
+        ){
             statement.setString(1, name);
             statement.setString(2, description);
             statement.setString(3, String.valueOf(sportID));
@@ -150,10 +152,6 @@ public class SQLSportTypeDAO implements ISportTypeDAO {
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new DAOException(e.getMessage());
-        } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
-            }
         }
     }
 

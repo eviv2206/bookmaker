@@ -15,6 +15,7 @@ import java.util.List;
 
 /**
  * Implementation of SQLBetTypeEventDAO
+ *
  * @author eviv2206
  * @version 1.0
  */
@@ -24,10 +25,9 @@ public class SQLBetTypeEventDAO implements IBetTypeEventDAO {
 
     @Override
     public void add(int betTypeEventEventId, int betTypeEventBetTypeId, double betTypeEventCoefficient) throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO bet_type_m2m_event(b_t_e_b_t_id, b_t_e_e_id, b_t_e_coefficient) VALUES(?,?,?)");
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement("INSERT INTO bet_type_m2m_event(b_t_e_b_t_id, b_t_e_e_id, b_t_e_coefficient) VALUES(?,?,?)")
+        ) {
             statement.setInt(1, betTypeEventBetTypeId);
             statement.setInt(2, betTypeEventEventId);
             statement.setDouble(3, betTypeEventCoefficient);
@@ -35,45 +35,37 @@ public class SQLBetTypeEventDAO implements IBetTypeEventDAO {
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new DAOException(e.getMessage());
-        } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
-            }
         }
     }
 
     @Override
     public void delete(int id) throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM bet_type_m2m_event WHERE b_t_e_id=?");
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement("DELETE FROM bet_type_m2m_event WHERE b_t_e_id=?");
+        ) {
             statement.setInt(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new DAOException(e.getMessage());
-        } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
-            }
         }
     }
 
     /**
      * Method of getting betTypeEvent by id
+     *
      * @param id
      * @return BetTypeEvent
      * @throws DAOException
      */
     @Override
     public BetTypeEvent getById(int id) throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM bet_type_m2m_event WHERE b_t_e_id=?");
+        ResultSet res = null;
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM bet_type_m2m_event WHERE b_t_e_id=?");
+        ) {
             statement.setString(1, String.valueOf(id));
-            ResultSet res = statement.executeQuery();
+            res = statement.executeQuery();
             if (res.next()) {
                 return extractBetTypeEventFromResultSet(res);
             } else {
@@ -83,20 +75,24 @@ public class SQLBetTypeEventDAO implements IBetTypeEventDAO {
             log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
+            if (res != null) {
+                try {
+                    res.close();
+                } catch (SQLException e) {
+                    log.error(e.getMessage());
+                }
             }
         }
     }
 
     @Override
     public List<BetTypeEvent> getAllBetTypeEventsByEventId(int eventId) throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM bet_type_m2m_event WHERE b_t_e_e_id=?");
+        ResultSet res = null;
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM bet_type_m2m_event WHERE b_t_e_e_id=?");
+        ) {
             statement.setString(1, String.valueOf(eventId));
-            ResultSet res = statement.executeQuery();
+            res = statement.executeQuery();
             List<BetTypeEvent> betTypeEvents = new ArrayList<>();
             while (res.next()) {
                 betTypeEvents.add(extractBetTypeEventFromResultSet(res));
@@ -105,25 +101,29 @@ public class SQLBetTypeEventDAO implements IBetTypeEventDAO {
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new DAOException(e.getMessage());
-        } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
+        }finally {
+            if (res != null) {
+                try {
+                    res.close();
+                } catch (SQLException e) {
+                    log.error(e.getMessage());
+                }
             }
         }
     }
 
     /**
      * Method of getting all betTypeEvents
-     * @return List<BetTypeEvent>
+     *
      * @throws DAOException
      */
     @Override
     public List<BetTypeEvent> getAllBetTypeEvents() throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM bet_type_m2m_event");
-            ResultSet res = statement.executeQuery();
+        ResultSet res = null;
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM bet_type_m2m_event");
+        ) {
+            res = statement.executeQuery();
             List<BetTypeEvent> betTypeEvents = new ArrayList<>();
             while (res.next()) {
                 betTypeEvents.add(extractBetTypeEventFromResultSet(res));
@@ -133,8 +133,12 @@ public class SQLBetTypeEventDAO implements IBetTypeEventDAO {
             log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
+            if (res != null) {
+                try {
+                    res.close();
+                } catch (SQLException e) {
+                    log.error(e.getMessage());
+                }
             }
         }
     }
@@ -142,6 +146,7 @@ public class SQLBetTypeEventDAO implements IBetTypeEventDAO {
 
     /**
      * Method of getting BetTypeEvent from result set
+     *
      * @param res
      * @return BetTypeEvent
      * @throws SQLException

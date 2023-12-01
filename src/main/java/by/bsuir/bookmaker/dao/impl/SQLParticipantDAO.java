@@ -22,41 +22,38 @@ public class SQLParticipantDAO implements IParticipantDAO {
 
     /**
      * Method of adding participant
+     *
      * @param name
      * @throws DAOException
      */
     @Override
     public void addParticipant(String name) throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO participant (p_name) VALUES (?)");
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement("INSERT INTO participant (p_name) VALUES (?)");
+        ) {
             statement.setString(1, name);
             statement.executeUpdate();
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new DAOException(e.getMessage());
-        } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
-            }
         }
     }
 
     /**
      * Method of getting participant
+     *
      * @param id
      * @return Participant
      * @throws DAOException
      */
     @Override
     public Participant getParticipant(int id) throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM participant WHERE p_id=?");
+        ResultSet res = null;
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM participant WHERE p_id=?");
+        ) {
             statement.setString(1, String.valueOf(id));
-            ResultSet res = statement.executeQuery();
+            res = statement.executeQuery();
             if (res.next()) {
                 return extractParticipantFromResultSet(res);
             } else {
@@ -66,23 +63,27 @@ public class SQLParticipantDAO implements IParticipantDAO {
             log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
+            if (res != null) {
+                try {
+                    res.close();
+                } catch (SQLException e) {
+                    log.error(e.getMessage());
+                }
             }
         }
     }
 
     /**
      * Method of deleting participant
+     *
      * @param id
      * @throws DAOException
      */
     @Override
     public void deleteParticipant(int id) throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM participant WHERE p_id=?");
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement("DELETE FROM participant WHERE p_id=?")
+        ) {
             statement.setString(1, String.valueOf(id));
             int affectedRows = statement.executeUpdate();
             if (affectedRows == 0) {
@@ -91,25 +92,21 @@ public class SQLParticipantDAO implements IParticipantDAO {
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new DAOException(e.getMessage());
-        } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
-            }
         }
     }
 
     /**
      * Method of updating participant
+     *
      * @param name
      * @param id
      * @throws DAOException
      */
     @Override
     public void updateParticipant(String name, int id) throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("UPDATE participant SET p_name=? WHERE p_id=?");
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement("UPDATE participant SET p_name=? WHERE p_id=?");
+        ) {
             statement.setString(1, name);
             statement.setString(2, String.valueOf(id));
             int affectedRows = statement.executeUpdate();
@@ -119,25 +116,19 @@ public class SQLParticipantDAO implements IParticipantDAO {
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new DAOException(e.getMessage());
-        } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
-            }
         }
     }
 
     /**
      * Method of getting all participants
-     * @return ArrayList<Participant>
      * @throws DAOException
      */
     @Override
     public ArrayList<Participant> getAllParticipants() throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM participant ORDER BY p_name DESC");
-            ResultSet res = statement.executeQuery();
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM participant ORDER BY p_name DESC");
+             ResultSet res = statement.executeQuery();
+        ){
             ArrayList<Participant> participants = new ArrayList<>();
             while (res.next()) {
                 participants.add(extractParticipantFromResultSet(res));
@@ -146,10 +137,6 @@ public class SQLParticipantDAO implements IParticipantDAO {
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new DAOException(e.getMessage());
-        } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
-            }
         }
     }
 

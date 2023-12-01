@@ -35,10 +35,10 @@ public class SQLEventDAO implements IEventDAO {
      */
     @Override
     public void addEvent(String name, String description, LocalDateTime date, String result, int tournamentID, List<Integer> participants) throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO event(e_name, e_description, e_start_time, e_result, e_t_id, e_p_id_winner) VALUES(?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+        ResultSet res = null;
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement("INSERT INTO event(e_name, e_description, e_start_time, e_result, e_t_id, e_p_id_winner) VALUES(?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+        ) {
             statement.setString(1, name);
             statement.setString(2, description);
             statement.setObject(3, date);
@@ -46,7 +46,7 @@ public class SQLEventDAO implements IEventDAO {
             statement.setString(5, String.valueOf(tournamentID));
             statement.setString(6, null);
             statement.executeUpdate();
-            ResultSet res = statement.getGeneratedKeys();
+            res = statement.getGeneratedKeys();
             if (res.next()){
                 int generatedEventId = res.getInt(1);
                 for (Integer participantId : participants) {
@@ -60,8 +60,12 @@ public class SQLEventDAO implements IEventDAO {
             log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
+            if (res != null) {
+                try {
+                    res.close();
+                } catch (SQLException e) {
+                    log.error(e.getMessage());
+                }
             }
         }
     }
@@ -74,14 +78,14 @@ public class SQLEventDAO implements IEventDAO {
      */
     @Override
     public Event getEvent(int id) throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM event\n" +
-                    "JOIN event_m2m_participant ON event.e_id = event_m2m_participant.e_p_e_id\n" +
-                    "WHERE event.e_id = ?;\n");
+        ResultSet set = null;
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM event\n" +
+                     "JOIN event_m2m_participant ON event.e_id = event_m2m_participant.e_p_e_id\n" +
+                     "WHERE event.e_id = ?;\n");
+             ) {
             statement.setInt(1, id);
-            ResultSet set = statement.executeQuery();
+            set = statement.executeQuery();
             if (set.next()) {
                 return extractEventFromResultSet(connection, set);
             } else {
@@ -91,8 +95,12 @@ public class SQLEventDAO implements IEventDAO {
             log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
+            if (set != null) {
+                try {
+                    set.close();
+                } catch (SQLException e) {
+                    log.error(e.getMessage());
+                }
             }
         }
     }

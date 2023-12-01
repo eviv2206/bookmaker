@@ -126,7 +126,6 @@ public class SQLUserBetDAO implements IUserBetDAO {
 
     /**
      * Method of getting all user bets
-     * @return List<UserBet>
      * @throws DAOException
      */
     @Override
@@ -154,7 +153,6 @@ public class SQLUserBetDAO implements IUserBetDAO {
     /**
      * Method of getting all user bets by user id
      * @param userId
-     * @return List<UserBet>
      * @throws DAOException
      */
     @Override
@@ -179,15 +177,14 @@ public class SQLUserBetDAO implements IUserBetDAO {
     /**
      * Method of getting all user bets by event id
      * @param eventId
-     * @return List<UserBet>
      * @throws DAOException
      */
     @Override
     public List<UserBet> getAllUserBetsByEventId(int eventId) throws DAOException {
-        Connection connection = null;
         IBetTypeEventDAO betTypeEventDAO = DAOFactory.getInstance().getBetTypeEventDAO();
-        try {
-            connection = connectionPool.getConnection();
+        ResultSet set = null;
+        try (Connection connection = connectionPool.getConnection();
+        ) {
             List<BetTypeEvent> betTypeEvents = betTypeEventDAO.getAllBetTypeEventsByEventId(eventId);
             List<Integer> betTypeEventsIDS = new ArrayList<>();
             for (BetTypeEvent betTypeEvent : betTypeEvents) {
@@ -195,7 +192,7 @@ public class SQLUserBetDAO implements IUserBetDAO {
             }
             String betTypeEventsIDSString = betTypeEventsIDS.stream().map(String::valueOf).collect(Collectors.joining(","));
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM user_bet WHERE u_b_b_t_e_id IN (" + betTypeEventsIDSString + ")");
-            ResultSet set = statement.executeQuery();
+            set = statement.executeQuery();
             List<UserBet> userBets = new java.util.ArrayList<>();
             while (set.next()) {
                 userBets.add(extractUserBetFromResultSet(set));
@@ -205,8 +202,12 @@ public class SQLUserBetDAO implements IUserBetDAO {
             log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
+            if (set != null) {
+                try {
+                    set.close();
+                } catch (SQLException e) {
+                    log.error(e.getMessage());
+                }
             }
         }
     }

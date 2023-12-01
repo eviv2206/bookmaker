@@ -136,16 +136,15 @@ public class SQLTournamentDAO implements ITournamentDAO {
 
     /**
      * Method of getting all tournaments
-     * @return ArrayList<Tournament>
      * @throws DAOException
      */
     @Override
     public ArrayList<Tournament> getAllTournaments() throws DAOException {
-        Connection connection = null;
-        try {
-            connection = connectionPool.getConnection();
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM tournament ORDER BY t_name DESC");
-            ResultSet res = statement.executeQuery();
+        ResultSet res = null;
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM tournament ORDER BY t_name DESC");
+        ){
+            res = statement.executeQuery();
             ArrayList<Tournament> tournaments = new ArrayList<>();
             while (res.next()){
                 tournaments.add(extractTournamentFromResultSet(res));
@@ -155,8 +154,12 @@ public class SQLTournamentDAO implements ITournamentDAO {
             log.error(e.getMessage());
             throw new DAOException(e.getMessage());
         } finally {
-            if (connectionPool != null) {
-                connectionPool.releaseConnection(connection);
+            if (res != null) {
+                try {
+                    res.close();
+                } catch (SQLException e) {
+                    log.error(e.getMessage());
+                }
             }
         }
     }
